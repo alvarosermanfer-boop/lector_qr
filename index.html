@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro por QR</title>
+
+  https://unpkg.com/html5-qrcodescript>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 16px;
+      max-width: 480px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    label {
+      margin-top: 12px;
+      display: block;
+      font-weight: bold;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      font-size: 16px;
+    }
+
+    button {
+      background: #2e7d32;
+      color: white;
+      border: none;
+      margin-top: 16px;
+    }
+
+    #reader {
+      width: 100%;
+      height: 300px;
+      margin-bottom: 10px;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>📦 Registro por QR</h1>
+
+<div id="reader"></div>
+
+<label>Código QR</label>
+<input id="qr" placeholder="Se llenará automáticamente o escribe a mano">
+
+<label>Cantidad</label>
+<input id="cantidad" type="number" min="1">
+
+<label>OT</label>
+<input id="ot">
+
+<button onclick="guardar()">💾 Guardar</button>
+
+<div id="status"></div>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbxo5qRFWUyS2Q3K_OZfDcuxZ0r6Q9V1RvrrMarV6xJ5nNbCkw2t2sSW0ysLMNE02fK7/exec";
+
+  function onScanSuccess(decodedText) {
+    document.getElementById("qr").value = decodedText;
+    html5QrcodeScanner.clear();
+  }
+
+  const html5QrcodeScanner = new Html5QrcodeScanner(
+    "reader",
+    { fps: 10, rememberLastUsedCamera: true },
+    false
+  );
+  html5QrcodeScanner.render(onScanSuccess);
+
+  function guardar() {
+    const qr = document.getElementById("qr").value;
+    const cantidad = document.getElementById("cantidad").value;
+    const ot = document.getElementById("ot").value;
+
+    if (!qr || !cantidad || !ot) {
+      document.getElementById("status").innerText = "❌ Faltan datos";
+      return;
+    }
+
+    fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        qr: qr,
+        cantidad: cantidad,
+        ot: ot
+      })
+    })
+    .then(() => {
+      document.getElementById("status").innerText = "✅ Registro guardado";
+      document.getElementById("qr").value = "";
+      document.getElementById("cantidad").value = "";
+      document.getElementById("ot").value = "";
+      html5QrcodeScanner.render(onScanSuccess);
+    })
+    .catch(() => {
+      document.getElementById("status").innerText = "❌ Error al guardar";
+    });
+  }
+</script>
+
+</body>
+</html>
