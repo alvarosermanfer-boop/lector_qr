@@ -1,67 +1,55 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro por QR</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- ✅ CARGA CORRECTA DE LA LIBRERÍA QR -->
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+<title>Registro por QR</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 16px;
-      max-width: 480px;
-      margin: auto;
-    }
+<!-- ✅ LIBRERÍA QR (ESTA LÍNEA ES CRÍTICA) -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
 
-    h1 {
-      text-align: center;
-    }
-
-    label {
-      margin-top: 12px;
-      display: block;
-      font-weight: bold;
-    }
-
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      font-size: 16px;
-    }
-
-    button {
-      background: #2e7d32;
-      color: white;
-      border: none;
-      margin-top: 16px;
-    }
-
-    #reader {
-      width: 100%;
-      height: 300px;
-      margin-bottom: 10px;
-    }
-
-    #status {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-  </style>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 16px;
+    max-width: 480px;
+    margin: auto;
+  }
+  h1 { text-align: center; }
+  label { display: block; margin-top: 12px; font-weight: bold; }
+  input, button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-top: 6px;
+  }
+  button {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    margin-top: 16px;
+  }
+  #reader {
+    width: 100%;
+    height: 300px;
+    margin-top: 12px;
+  }
+  #status {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+</style>
 </head>
 
 <body>
 
 <h1>📦 Registro por QR</h1>
 
-<!-- LECTOR QR -->
 <div id="reader"></div>
 
 <label>Código QR</label>
-<input id="qr" placeholder="Se rellena automáticamente o escribe a mano">
+<input id="qr" placeholder="Se rellenará automáticamente o escribe a mano">
 
 <label>Cantidad</label>
 <input id="cantidad" type="number" min="1">
@@ -76,27 +64,47 @@
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbxo5qRFWUyS2Q3K_OZfDcuxZ0r6Q9V1RvrrMarV6xJ5nNbCkw2t2sSW0ysLMNE02fK7/exec";
 
+  function beep() {
+    const ctx = new AudioContext();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.type = "sine";
+    o.frequency.value = 1000;
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.2);
+  }
+
+  function vibrate() {
+    if (navigator.vibrate) {
+      navigator.vibrate(200);
+    }
+  }
+
   function onScanSuccess(decodedText) {
     document.getElementById("qr").value = decodedText;
     document.getElementById("status").innerText = "✅ QR leído";
-    html5QrcodeScanner.clear();
+    beep();
+    vibrate();
+    scanner.clear();
   }
 
-  const html5QrcodeScanner = new Html5QrcodeScanner(
+  const scanner = new Html5QrcodeScanner(
     "reader",
     { fps: 10, rememberLastUsedCamera: true },
     false
   );
 
-  html5QrcodeScanner.render(onScanSuccess);
+  scanner.render(onScanSuccess);
 
   function guardar() {
-    const qr = document.getElementById("qr").value;
-    const cantidad = document.getElementById("cantidad").value;
-    const ot = document.getElementById("ot").value;
+    const qr = qr.value;
+    const cantidad = cantidad.value;
+    const ot = ot.value;
 
     if (!qr || !cantidad || !ot) {
-      document.getElementById("status").innerText = "❌ Faltan datos";
+      status.innerText = "❌ Faltan datos";
       return;
     }
 
@@ -106,14 +114,14 @@
       body: JSON.stringify({ qr, cantidad, ot })
     })
     .then(() => {
-      document.getElementById("status").innerText = "✅ Registro guardado";
-      document.getElementById("qr").value = "";
-      document.getElementById("cantidad").value = "";
-      document.getElementById("ot").value = "";
-      html5QrcodeScanner.render(onScanSuccess);
+      status.innerText = "✅ Registro guardado";
+      qr.value = "";
+      cantidad.value = "";
+      ot.value = "";
+      scanner.render(onScanSuccess);
     })
     .catch(() => {
-      document.getElementById("status").innerText = "❌ Error al guardar";
+      status.innerText = "❌ Error al guardar";
     });
   }
 </script>
