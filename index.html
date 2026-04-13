@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro por QR</title>
 
-  https://unpkg.com/html5-qrcodescript>
+  <!-- ✅ CARGA CORRECTA DE LA LIBRERÍA QR -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
 
   <style>
     body {
@@ -56,10 +57,11 @@
 
 <h1>📦 Registro por QR</h1>
 
+<!-- LECTOR QR -->
 <div id="reader"></div>
 
 <label>Código QR</label>
-<input id="qr" placeholder="Se llenará automáticamente o escribe a mano">
+<input id="qr" placeholder="Se rellena automáticamente o escribe a mano">
 
 <label>Cantidad</label>
 <input id="cantidad" type="number" min="1">
@@ -76,6 +78,7 @@
 
   function onScanSuccess(decodedText) {
     document.getElementById("qr").value = decodedText;
+    document.getElementById("status").innerText = "✅ QR leído";
     html5QrcodeScanner.clear();
   }
 
@@ -84,6 +87,7 @@
     { fps: 10, rememberLastUsedCamera: true },
     false
   );
+
   html5QrcodeScanner.render(onScanSuccess);
 
   function guardar() {
@@ -98,11 +102,8 @@
 
     fetch(API_URL, {
       method: "POST",
-      body: JSON.stringify({
-        qr: qr,
-        cantidad: cantidad,
-        ot: ot
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ qr, cantidad, ot })
     })
     .then(() => {
       document.getElementById("status").innerText = "✅ Registro guardado";
@@ -119,3 +120,4 @@
 
 </body>
 </html>
+
