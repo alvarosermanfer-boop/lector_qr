@@ -1,45 +1,72 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>Escáner QR Web</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="stylesheet" href="styles.css" />
 
-  <title>Prueba Cámara</title>
-
-  <!-- ESTA LÍNEA ES CLAVE -->
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+  <!-- Librería jsQR vía CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
-
 <body>
+  <header>
+    <h1>📷 Escáner QR</h1>
+  </header>
 
-<h1>✅ Si ves este texto, el HTML carga</h1>
+  <main>
+    <!-- Vista previa cámara -->
+    <div class="camera-container">
+      <video id="video" playsinline></video>
+      <canvas id="canvas" hidden></canvas>
+    </div>
 
-<button id="start">📷 Iniciar cámara</button>
+    <!-- Controles -->
+    <div class="controls">
+      <button id="startBtn">▶ Iniciar escaneo</button>
+      <button id="stopBtn" disabled>⏹ Detener</button>
+      <button id="torchBtn" hidden>🔦 Linterna</button>
 
-<div id="reader" style="width:300px;height:300px;margin-top:10px;"></div>
+      <select id="cameraSelect"></select>
+    </div>
 
-<script>
-  let scanner;
+    <!-- Estado -->
+    <p id="status" class="status">Listo</p>
 
-  document.getElementById("start").addEventListener("click", function () {
-    scanner = new Html5Qrcode("reader");
+    <!-- Resultado -->
+    <section class="result">
+      <h2>Resultado</h2>
+      <textarea id="resultText" readonly placeholder="El texto del QR aparecerá aquí..."></textarea>
 
-    scanner.start(
-      { facingMode: "environment" },
-      { fps: 10 },
-      function (text) {
-        alert("QR leído: " + text);
-        scanner.stop();
-      }
-    ).catch(err => {
-        alert("ERROR al abrir cámara: " + err);
-    });
-  });
-</script>
+      <div class="result-actions">
+        <button id="copyBtn">📋 Copiar</button>
+        <button id="openLinkBtn" disabled>🔗 Abrir enlace</button>
+        <button id="clearBtn">🧹 Limpiar</button>
+      </div>
+    </section>
 
+    <!-- Fallback: subir imagen -->
+    <section class="upload">
+      <h3>O escanear desde una imagen</h3>
+      <input type="file" id="fileInput" accept="image/*">
+    </section>
+
+    <!-- Historial -->
+    <section class="history">
+      <h3>Historial</h3>
+      <ul id="historyList"></ul>
+      <button id="clearHistoryBtn">🗑 Borrar historial</button>
+    </section>
+  </main>
+
+  <footer>
+    <small>Funciona solo en HTTPS · GitHub Pages ✔</small>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>
-
 
 
 
