@@ -3,30 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Prueba Cámara</title>
 
-  <!-- ✅ SCRIPT CORRECTO (NO MODIFICAR) -->
+  <!-- ESTA LÍNEA ES CLAVE -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 480px;
-      margin: auto;
-      padding: 16px;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      margin-top: 12px;
-    }
-    #reader {
-      width: 100%;
-      height: 300px;
-      margin-top: 12px;
-    }
-  </style>
 </head>
 
 <body>
@@ -35,27 +16,24 @@
 
 <button id="start">📷 Iniciar cámara</button>
 
-<div id="reader"></div>
+<div id="reader" style="width:300px;height:300px;margin-top:10px;"></div>
 
 <script>
   let scanner;
 
-  document.getElementById("start").addEventListener("click", () => {
-    if (!scanner) {
-      scanner = new Html5Qrcode("reader");
-    }
+  document.getElementById("start").addEventListener("click", function () {
+    scanner = new Html5Qrcode("reader");
 
     scanner.start(
       { facingMode: "environment" },
       { fps: 10 },
-      (text) => {
+      function (text) {
         alert("QR leído: " + text);
         scanner.stop();
-      },
-      (err) => {
-        console.log("Escaneando...");
       }
-    );
+    ).catch(err => {
+        alert("ERROR al abrir cámara: " + err);
+    });
   });
 </script>
 
