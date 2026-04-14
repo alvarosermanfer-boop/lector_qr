@@ -1,30 +1,27 @@
-<!DOCTYPE html>
-<html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Prueba Cámara</title>
 
-  <!-- ✅ SCRIPT CORRECTO -->
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min</head>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+</head>
 
 <body>
+  <h1>✅ Si ves este texto, el HTML carga</h1>
 
-<h1>✅ Si ves este texto, el HTML carga</h1>
+  <div id="reader" style="width:300px; height:300px;"></div>
 
-<div id="reader" style="width:300px; height:300px;"></div>
+  <script>
+    const scanner = new Html5Qrcode("reader");
 
-<script>
-  const scanner = new Html5Qrcode("reader");
-
-  scanner.start(
-    { facingMode: "environment" },
-    { fps: 10 },
-    text => alert("QR leído: " + text)
-  );
-</script>
-
+    scanner.start(
+      { facingMode: "environment" },
+      { fps: 10 },
+      text => alert("QR leído: " + text)
+    );
+  </script>
 </body>
-</html>
+
+
 
 
