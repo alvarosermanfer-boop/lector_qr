@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Prueba Cámara</title>
 
+  <!-- ✅ SCRIPT CORRECTO (NO MODIFICAR) -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
 
   <style>
@@ -15,9 +16,9 @@
       padding: 16px;
     }
     button {
+      width: 100%;
       padding: 12px;
       font-size: 16px;
-      width: 100%;
       margin-top: 12px;
     }
     #reader {
@@ -37,13 +38,23 @@
 <div id="reader"></div>
 
 <script>
-  const scanner = new Html5Qrcode("reader");
+  let scanner;
 
   document.getElementById("start").addEventListener("click", () => {
+    if (!scanner) {
+      scanner = new Html5Qrcode("reader");
+    }
+
     scanner.start(
       { facingMode: "environment" },
       { fps: 10 },
-      text => alert("QR leído: " + text)
+      (text) => {
+        alert("QR leído: " + text);
+        scanner.stop();
+      },
+      (err) => {
+        console.log("Escaneando...");
+      }
     );
   });
 </script>
