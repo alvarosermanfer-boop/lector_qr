@@ -3,36 +3,54 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <title>Prueba Cámara</title>
 
-  <!-- CARGA DE LA LIBRERÍA -->
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.jsead>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 480px;
+      margin: auto;
+      padding: 16px;
+    }
+    button {
+      padding: 12px;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 12px;
+    }
+    #reader {
+      width: 100%;
+      height: 300px;
+      margin-top: 12px;
+    }
+  </style>
+</head>
 
 <body>
 
 <h1>✅ Si ves este texto, el HTML carga</h1>
 
-<div id="reader" style="width:300px; height:300px;"></div>
+<button id="start">📷 Iniciar cámara</button>
+
+<div id="reader"></div>
 
 <script>
-  window.addEventListener("load", function () {
+  const scanner = new Html5Qrcode("reader");
 
-    const scanner = new Html5Qrcode("reader");
-
+  document.getElementById("start").addEventListener("click", () => {
     scanner.start(
       { facingMode: "environment" },
       { fps: 10 },
-      function (text) {
-        alert("QR leído: " + text);
-      }
+      text => alert("QR leído: " + text)
     );
-
   });
 </script>
 
 </body>
 </html>
+
 
 
 
