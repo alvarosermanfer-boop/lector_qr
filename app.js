@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fecha: new Date().toLocaleString(),
             caf: inputCaf.value,
             cantidad: document.getElementById('input-cantidad').value,
-            clase: document.getElementById('select-clase').value,
+            //clase: document.getElementById('select-clase').value,
             ot: document.getElementById('input-ot').value,
             chapa: inputChapa.value
         };
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Error al enviar los datos. Revisa la consola.");
         } finally {
             btnSubmit.disabled = false;
-            btnSubmit.textContent = "ENVIAR A GOOGLE SHEETS";
+            btnSubmit.textContent = "REGISTRAR SALIDA DE MATERIAL";
         }
     });
 
