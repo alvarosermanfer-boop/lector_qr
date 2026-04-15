@@ -1,4 +1,4 @@
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0KXI8bfAZTGiJx-SO4zXlZg6QJBc1sOvQgvGWhmasefjMz_BQXFldxstXPdWaB167/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_lJHsTJ-4lBPIZ8sHZ7L9vfpSA-GPHZL8sa-4WQKuTuFQKVegtvqkg4P0RfqIizCk/exec";
 // URL DE TU APLICACIÓN WEB DE GOOGLE (Pega aquí la URL que obtuviste en el paso 1)
 
 
