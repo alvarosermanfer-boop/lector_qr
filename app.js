@@ -1,5 +1,5 @@
 // URL DE TU APLICACIÓN WEB DE GOOGLE (Pega aquí la URL que obtuviste en el paso 1)
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_bOvSBN9bzSblDcQwLeqVqJhjCcD4et3b6i2yZMggSdzNd3QAfQjJGMDVd1txSJmt/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx3hILf2GnsfAjL4VlPcI13NY_nOhIgbHsNPZoWrmctDi4BdBbjhqzUCEZcbX8X4ydo/exec";
 
 document.addEventListener('DOMContentLoaded', () => {
     const mainForm = document.getElementById('main-form');
@@ -66,11 +66,13 @@ document.addEventListener('DOMContentLoaded', () => {
         btnSubmit.disabled = true;
         btnSubmit.textContent = "Enviando...";
 
+        const ahora = new Date();
+        
         const payload = {
-            fecha: new Date().toLocaleString(),
+            soloFecha: ahora.toLocaleDateString(), // Ejemplo: 15/04/2026
+            soloHora: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), // Ejemplo: 15:30
             caf: inputCaf.value,
             cantidad: document.getElementById('input-cantidad').value,
-            //clase: document.getElementById('select-clase').value,
             ot: document.getElementById('input-ot').value,
             chapa: inputChapa.value
         };
