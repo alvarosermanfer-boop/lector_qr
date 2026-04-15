@@ -1,6 +1,10 @@
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx3hILf2GnsfAjL4VlPcI13NY_nOhIgbHsNPZoWrmctDi4BdBbjhqzUCEZcbX8X4ydo/exec";
+// SUSTITUYE ESTA URL POR LA TUYA
+const GOOGLE_SCRIPT_URL = "TU_URL_AQUI"; 
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("App cargada y lista"); // Verás esto en la consola al abrir la web
+
     const mainForm = document.getElementById('main-form');
     const inputChapa = document.getElementById('input-chapa');
     const inputCaf = document.getElementById('input-caf');
@@ -12,11 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let scanning = false;
     let stream = null;
 
-    // Cargar Chapa persistente
     const savedChapa = localStorage.getItem('chapa_operario');
     if (savedChapa) inputChapa.value = savedChapa;
 
-    // Función Abrir Cámara
     const openScanner = async () => {
         try {
             stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
@@ -25,18 +27,16 @@ document.addEventListener('DOMContentLoaded', () => {
             scanning = true;
             requestAnimationFrame(tick);
         } catch (err) {
-            alert("Error: No se pudo acceder a la cámara.");
+            alert("Error cámara: " + err);
         }
     };
 
-    // Función Cerrar Cámara
     const closeScanner = () => {
         scanning = false;
         if (stream) stream.getTracks().forEach(t => t.stop());
         scannerModal.hidden = true;
     };
 
-    // Bucle de lectura QR
     const tick = () => {
         if (!scanning) return;
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
             canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
             const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
             const code = jsQR(imageData.data, imageData.width, imageData.height);
-
             if (code) {
                 if (navigator.vibrate) navigator.vibrate(150);
                 inputCaf.value = code.data;
@@ -56,12 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(tick);
     };
 
-    // Envío de Datos a Google
+    // --- SECCIÓN CRÍTICA: EL ENVÍO ---
     mainForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        // Guardar chapa localmente
-        localStorage.setItem('chapa_operario', inputChapa.value);
+        console.log("Botón Enviar pulsado. Preparando datos...");
+
+        if (GOOGLE_SCRIPT_URL === "TU_URL_AQUI" || !GOOGLE_SCRIPT_URL.startsWith("https")) {
+            alert("ERROR: No has puesto la URL de Google Script en app.js");
+            return;
+        }
 
         const btnSubmit = document.getElementById('btn-submit');
         btnSubmit.disabled = true;
@@ -77,33 +79,31 @@ document.addEventListener('DOMContentLoaded', () => {
             chapa: inputChapa.value
         };
 
+        console.log("Enviando este paquete:", payload);
+
         try {
-            // Envío en modo no-cors para evitar bloqueos del navegador
-            await fetch(GOOGLE_SCRIPT_URL, {
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                cache: 'no-cache',
                 body: JSON.stringify(payload)
             });
-
-            alert("Registro guardado con éxito.");
             
-            // Limpiar formulario (excepto chapa)
+            console.log("Petición finalizada");
+            alert("Registro enviado (revisa tu Excel ahora)");
+            
             inputCaf.value = "";
             document.getElementById('input-cantidad').value = "";
             document.getElementById('input-ot').value = "";
+            localStorage.setItem('chapa_operario', inputChapa.value);
             
         } catch (error) {
-            alert("Error de conexión. Verifica que la URL del Script sea correcta.");
+            console.error("Error en el fetch:", error);
+            alert("Error de conexión: " + error.message);
         } finally {
             btnSubmit.disabled = false;
             btnSubmit.textContent = "ENVIAR REGISTRO";
         }
     });
-
-    document.getElementById('btn-open-scanner').addEventListener('click', openScanner);
-    document.getElementById('btn-close-scanner').addEventListener('click', closeScanner);
-});
 
     document.getElementById('btn-open-scanner').addEventListener('click', openScanner);
     document.getElementById('btn-close-scanner').addEventListener('click', closeScanner);
