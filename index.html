@@ -2,50 +2,64 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>QR Scanner PWA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Producción CAF</title>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <main class="app-container">
+    <div class="app-container">
         <header>
-            <h1>Escáner QR</h1>
-            <p id="status-indicator" class="status idle">Esperando acción...</p>
+            <h1>Registro de Trabajo</h1>
+            <p id="global-status" class="status">Listo para registrar</p>
         </header>
 
-        <section class="scanner-section">
-            <div id="video-container">
-                <video id="qr-video" playsinline autoplay hidden></video>
-                <div id="scan-region-highlight" hidden></div>
+        <form id="main-form">
+            <div class="form-group">
+                <label for="input-caf">Código CAF</label>
+                <div class="input-with-action">
+                    <input type="text" id="input-caf" placeholder="Escanear o escribir..." required>
+                    <button type="button" id="btn-open-scanner" class="btn-icon">📷</button>
+                </div>
             </div>
-            <canvas id="qr-canvas" hidden></canvas>
-            
-            <div id="fallback-container" hidden>
-                <p>No se pudo acceder a la cámara. Sube una imagen:</p>
-                <input type="file" id="file-input" accept="image/*">
-            </div>
-        </section>
 
-        <section class="controls">
-            <button id="btn-start" class="btn primary">Iniciar Cámara</button>
-            <button id="btn-stop" class="btn danger" hidden>Detener</button>
-            <button id="btn-switch" class="btn secondary" hidden>Cambiar Cámara</button>
-        </section>
-
-        <section id="result-section" class="result-section" hidden>
-            <h2>Resultado:</h2>
-            <div class="result-box">
-                <p id="result-text"></p>
+            <div class="form-group">
+                <label for="input-cantidad">Cantidad</label>
+                <input type="number" id="input-cantidad" required>
             </div>
-            <div class="result-actions">
-                <button id="btn-copy" class="btn secondary">Copiar Texto</button>
-                <button id="btn-open-link" class="btn primary" hidden>Abrir Enlace</button>
-                <button id="btn-clear" class="btn danger">Limpiar</button>
-            </div>
-        </section>
-    </main>
 
+            <div class="form-group">
+                <label for="select-clase">Clase de Trabajo</label>
+                <select id="select-clase">
+                    <option value="PRE">PRE</option>
+                    <option value="COR">COR</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="input-ot">OT</label>
+                <input type="text" id="input-ot" required>
+            </div>
+
+            <div class="form-group">
+                <label for="input-chapa">Chapa Operario</label>
+                <input type="text" id="input-chapa" required>
+            </div>
+
+            <button type="submit" id="btn-submit" class="btn primary full-width">ENVIAR A GOOGLE SHEETS</button>
+        </form>
+
+        <div id="scanner-modal" class="modal" hidden>
+            <div class="modal-content">
+                <div class="video-wrapper">
+                    <video id="qr-video" playsinline autoplay></video>
+                    <canvas id="qr-canvas" hidden></canvas>
+                    <div class="scan-overlay"></div>
+                </div>
+                <button type="button" id="btn-close-scanner" class="btn danger">Cancelar</button>
+            </div>
+        </div>
+    </div>
     <script src="app.js"></script>
 </body>
 </html>
