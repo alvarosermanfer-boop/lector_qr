@@ -1,6 +1,4 @@
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx3hILf2GnsfAjL4VlPcI13NY_nOhIgbHsNPZoWrmctDi4BdBbjhqzUCEZcbX8X4ydo/exec";
-// SUSTITUYE ESTA URL POR LA TUYA
-const GOOGLE_SCRIPT_URL = "TU_URL_AQUI"; 
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0KXI8bfAZTGiJx-SO4zXlZg6QJBc1sOvQgvGWhmasefjMz_BQXFldxstXPdWaB167/exec";
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("App cargada y lista"); // Verás esto en la consola al abrir la web
