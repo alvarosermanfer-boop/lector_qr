@@ -1,6 +1,6 @@
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_lJHsTJ-4lBPIZ8sHZ7L9vfpSA-GPHZL8sa-4WQKuTuFQKVegtvqkg4P0RfqIizCk/exec";
-// URL DE TU APLICACIÓN WEB DE GOOGLE (Pega aquí la URL que obtuviste en el paso 1)
 
+// URL DE TU APLICACIÓN WEB DE GOOGLE (Pega aquí la URL que obtuviste en el paso 1)
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8m6Tc4xI5Yf2LB6GiT7X0muqf0lQvB7jH9kNRSYYy5ZdVwoDR3xaG008TUc1uqFC6/exec";
 
 document.addEventListener('DOMContentLoaded', () => {
     const mainForm = document.getElementById('main-form');
@@ -14,11 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let scanning = false;
     let stream = null;
 
-    // 1. Persistencia: Cargar chapa guardada
+    // Cargar chapa guardada
     const savedChapa = localStorage.getItem('chapa_operario');
     if (savedChapa) inputChapa.value = savedChapa;
 
-    // 2. Lógica del Escáner
     const openScanner = async () => {
         try {
             stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
@@ -27,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             scanning = true;
             requestAnimationFrame(tick);
         } catch (err) {
+            console.error("Error cámara:", err);
             alert("No se pudo acceder a la cámara");
         }
     };
@@ -49,55 +49,57 @@ document.addEventListener('DOMContentLoaded', () => {
             if (code) {
                 if (navigator.vibrate) navigator.vibrate(100);
                 inputCaf.value = code.data;
-                closeScanner(); // Cerrar cámara al detectar
+                closeScanner();
                 return;
             }
         }
         requestAnimationFrame(tick);
     };
 
-    // 3. Envío de datos
     mainForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Guardar chapa para la próxima vez
-        localStorage.setItem('chapa_operario', inputChapa.value);
-
         const btnSubmit = document.getElementById('btn-submit');
         btnSubmit.disabled = true;
-        btnSubmit.textContent = "Enviando...";
+        btnSubmit.textContent = "Registrando...";
 
+        // Guardar la chapa para el futuro
+        localStorage.setItem('chapa_operario', inputChapa.value);
+
+        const ahora = new Date();
         const payload = {
-            fecha: new Date().toLocaleString(),
+            soloFecha: ahora.toLocaleDateString('es-ES'),
+            soloHora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
             caf: inputCaf.value,
             cantidad: document.getElementById('input-cantidad').value,
-            clase: document.getElementById('select-clase').value,
             ot: document.getElementById('input-ot').value,
             chapa: inputChapa.value
         };
 
+        console.log("Enviando datos:", payload);
+
         try {
-            // Usamos mode: 'no-cors' si hay problemas de redirección, 
-            // pero Google Apps Script funciona mejor con fetch estándar si está bien configurado
+            // El modo no-cors es vital para Google Apps Script
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Necesario para Google Apps Script desde el navegador
+                mode: 'no-cors',
                 cache: 'no-cache',
                 body: JSON.stringify(payload)
             });
 
-            alert("¡Datos guardados correctamente!");
-            // Limpiar campos menos Chapa y Clase
+            alert("Material registrado correctamente.");
+            
+            // Limpiar campos menos Chapa
             inputCaf.value = "";
             document.getElementById('input-cantidad').value = "";
             document.getElementById('input-ot').value = "";
             
         } catch (error) {
-            console.error(error);
-            alert("Error al enviar los datos. Revisa la consola.");
+            console.error("Error en el envío:", error);
+            alert("Hubo un error al conectar con Google Sheets.");
         } finally {
             btnSubmit.disabled = false;
-            btnSubmit.textContent = "ENVIAR A GOOGLE SHEETS";
+            btnSubmit.textContent = "Enviar Salida de Material";
         }
     });
 
