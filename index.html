@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salida de Material - CAF</title>
+    <title>Salida Material CAF</title>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -25,7 +25,7 @@
 
             <div class="form-group">
                 <label for="input-cantidad">Cantidad</label>
-                <input type="text" id="input-cantidad" placeholder="Ej: 12.5, 4 unidades..." required>
+                <input type="text" id="input-cantidad" placeholder="Ej: 10.5 o 10 unidades" required>
             </div>
 
             <div class="form-group">
@@ -38,6 +38,11 @@
                 <input type="text" id="input-chapa" required>
             </div>
 
+            <div class="form-group">
+                <label for="input-obs">Observaciones</label>
+                <textarea id="input-obs" rows="2" placeholder="Opcional..."></textarea>
+            </div>
+
             <button type="submit" id="btn-submit" class="btn primary full-width">Enviar Salida de Material</button>
         </form>
 
@@ -48,7 +53,7 @@
                     <canvas id="qr-canvas" hidden></canvas>
                     <div class="scan-overlay"></div>
                 </div>
-                <button type="button" id="btn-close-scanner" class="btn danger">Cancelar</button>
+                <button type="button" id="btn-close-scanner" class="btn danger">Cancelar Escaneo</button>
             </div>
         </div>
     </div>
