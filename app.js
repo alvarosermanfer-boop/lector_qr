@@ -1,70 +1,23 @@
 
 // URL DE TU APLICACIÓN WEB DE GOOGLE (Pega aquí la URL que obtuviste en el paso 1)
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8m6Tc4xI5Yf2LB6GiT7X0muqf0lQvB7jH9kNRSYYy5ZdVwoDR3xaG008TUc1uqFC6/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzooOwK97GjqB3Mw593mzD64c1lkGkS8eoNXQVcGMxeS8lCT0dAB_Rv1PWt92NFI2Ld/exec";
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const mainForm = document.getElementById('main-form');
     const inputChapa = document.getElementById('input-chapa');
     const inputCaf = document.getElementById('input-caf');
-    const scannerModal = document.getElementById('scanner-modal');
-    const video = document.getElementById('qr-video');
-    const canvasElement = document.getElementById('qr-canvas');
-    const canvas = canvasElement.getContext('2d');
-    
-    let scanning = false;
-    let stream = null;
+    const btnSubmit = document.getElementById('btn-submit');
 
-    // Cargar chapa guardada
-    const savedChapa = localStorage.getItem('chapa_operario');
-    if (savedChapa) inputChapa.value = savedChapa;
+    if (localStorage.getItem('chapa_operario')) {
+        inputChapa.value = localStorage.getItem('chapa_operario');
+    }
 
-    const openScanner = async () => {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            video.srcObject = stream;
-            scannerModal.hidden = false;
-            scanning = true;
-            requestAnimationFrame(tick);
-        } catch (err) {
-            console.error("Error cámara:", err);
-            alert("No se pudo acceder a la cámara");
-        }
-    };
-
-    const closeScanner = () => {
-        scanning = false;
-        if (stream) stream.getTracks().forEach(t => t.stop());
-        scannerModal.hidden = true;
-    };
-
-    const tick = () => {
-        if (!scanning) return;
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            canvasElement.height = video.videoHeight;
-            canvasElement.width = video.videoWidth;
-            canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
-            const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-            const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-            if (code) {
-                if (navigator.vibrate) navigator.vibrate(100);
-                inputCaf.value = code.data;
-                closeScanner();
-                return;
-            }
-        }
-        requestAnimationFrame(tick);
-    };
-
-    mainForm.addEventListener('submit', async (e) => {
+    mainForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        const btnSubmit = document.getElementById('btn-submit');
         btnSubmit.disabled = true;
-        btnSubmit.textContent = "Registrando...";
-
-        // Guardar la chapa para el futuro
-        localStorage.setItem('chapa_operario', inputChapa.value);
+        btnSubmit.textContent = "ENVIANDO...";
 
         const ahora = new Date();
         const payload = {
@@ -76,33 +29,31 @@ document.addEventListener('DOMContentLoaded', () => {
             chapa: inputChapa.value
         };
 
-        console.log("Enviando datos:", payload);
+        // Guardamos la chapa
+        localStorage.setItem('chapa_operario', inputChapa.value);
 
-        try {
-            // El modo no-cors es vital para Google Apps Script
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                body: JSON.stringify(payload)
-            });
-
-            alert("Material registrado correctamente.");
-            
-            // Limpiar campos menos Chapa
+        // Usamos la API de baliza o un fetch con modo 'no-cors'
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', 
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            alert("¡Salida de material registrada!");
+            // Limpiamos campos menos la chapa
             inputCaf.value = "";
             document.getElementById('input-cantidad').value = "";
             document.getElementById('input-ot').value = "";
-            
-        } catch (error) {
-            console.error("Error en el envío:", error);
-            alert("Hubo un error al conectar con Google Sheets.");
-        } finally {
+        })
+        .catch(err => {
+            console.error("Fallo de red:", err);
+            alert("Error de conexión. Verifica internet.");
+        })
+        .finally(() => {
             btnSubmit.disabled = false;
             btnSubmit.textContent = "Enviar Salida de Material";
-        }
+        });
     });
-
-    document.getElementById('btn-open-scanner').addEventListener('click', openScanner);
-    document.getElementById('btn-close-scanner').addEventListener('click', closeScanner);
 });
